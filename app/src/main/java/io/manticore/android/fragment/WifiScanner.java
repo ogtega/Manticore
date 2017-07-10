@@ -24,8 +24,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.manticore.android.MainActivity;
 import io.manticore.android.R;
 import io.manticore.android.model.AccessPoint;
+import io.manticore.android.util.NetUtils;
 import io.reactivex.functions.Consumer;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -43,44 +45,55 @@ public class WifiScanner extends Fragment {
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
 
     private Context mContext;
-    private Handler mHandler = new Handler();
+    private Handler mHandler;
     private List<AccessPoint> mAccessPoints = new ArrayList<>();
     private FastItemAdapter<AccessPoint> mFastAdapter = new FastItemAdapter<>();
-
-    public WifiScanner() {}
 
     private Runnable wifiScan = new Runnable() {
         @Override
         @AfterPermissionGranted(RC_COARSE_LOCATION)
         public void run() {
-            getWifiManager(mContext.getApplicationContext()).startScan();
-
-            if (EasyPermissions.hasPermissions(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                Log.i(TAG, "scanning");
-                new io.manticore.android.util.WifiScanner(new Consumer<ScanResult>() {
-                    @Override
-                    public void accept(@io.reactivex.annotations.NonNull ScanResult result) throws Exception {
-                        mHandler.removeCallbacks(wifiScan);
-
-                        // Check if the result is a duplicate access point
-                        for (int i = 0; i < mAccessPoints.size(); i++) {
-                            if (mAccessPoints.get(i).matches(result.BSSID)) {
-                                mHandler.postDelayed(wifiScan, 5000);
-                                return;
-                            }
-                        }
-
-                        mAccessPoints.add(new AccessPoint(result));
-                        Collections.sort(mAccessPoints, new AccessPoint.LevelComparator());
-                        mFastAdapter.setNewList(mAccessPoints);
-                        mHandler.postDelayed(wifiScan, 5000);
-                    }
-                }).start(mContext);
+            if(NetUtils.isOnWifi(mContext)) {
+                if (isAdded()) {
+                    ((MainActivity) getActivity()).updateFragment();
+                }
             } else {
-                EasyPermissions.requestPermissions((Activity) mContext, getString(R.string.permission_location_rationale), RC_COARSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+                getWifiManager(mContext.getApplicationContext()).startScan();
+
+                if (EasyPermissions.hasPermissions(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    Log.i(TAG, "scanning");
+                    new io.manticore.android.util.WifiScanner(new Consumer<ScanResult>() {
+                        @Override
+                        public void accept(@io.reactivex.annotations.NonNull ScanResult result) throws Exception {
+                            mHandler.removeCallbacks(wifiScan);
+
+                            // Check if the result is a duplicate access point
+                            for (int i = 0; i < mAccessPoints.size(); i++) {
+                                if (mAccessPoints.get(i).matches(result.BSSID)) {
+                                    mHandler.postDelayed(wifiScan, 6000);
+                                    return;
+                                }
+                            }
+
+                            mAccessPoints.add(new AccessPoint(result));
+                            Collections.sort(mAccessPoints, new AccessPoint.LevelComparator());
+                            mFastAdapter.setNewList(mAccessPoints);
+                            mHandler.postDelayed(wifiScan, 6000);
+                        }
+                    }).start(mContext);
+                } else {
+                    EasyPermissions.requestPermissions((Activity) mContext, getString(R.string.permission_location_rationale), RC_COARSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+                }
             }
         }
     };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mHandler = new Handler();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -109,6 +122,20 @@ public class WifiScanner extends Fragment {
         super.onResume();
 
         mHandler.post(wifiScan);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        mHandler.removeCallbacks(wifiScan);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        mHandler.removeCallbacks(wifiScan);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package io.manticore.android;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -15,13 +13,13 @@ import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.manticore.android.fragment.NetworkScanner;
 import io.manticore.android.fragment.WifiScanner;
+import io.manticore.android.util.NetUtils;
 
 public class MainActivity extends AppCompatActivity {
 
     protected @BindView(R.id.toolbar) Toolbar mToolbar;
-
-    private NetworkInfo networkInfo;
 
     @OnClick(R.id.fab)
     protected void newPolicy(View view) {
@@ -41,23 +39,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        networkInfo = ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-
-        if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            // TODO: Start the network mapper fragment
-        } else {
-            transaction.replace(R.id.fragment, new WifiScanner());
-        }
-
-        transaction.commit();
+        updateFragment();
     }
 
     @Override
@@ -76,5 +64,18 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void updateFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+
+        if (NetUtils.isOnWifi(this)) {
+            transaction.replace(R.id.fragment, new NetworkScanner());
+        } else {
+            transaction.replace(R.id.fragment, new WifiScanner());
+        }
+
+        transaction.commit();
     }
 }
