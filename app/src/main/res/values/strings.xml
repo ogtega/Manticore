@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Manticore</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="permission_location_rationale">This application needs location permissions in order to scan nearby networks</string>
+</resources>
