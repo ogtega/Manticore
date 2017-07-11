@@ -118,8 +118,8 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
     }
 
     // Compare AccessPoints by their MAC Address
-    public Boolean matches(String BSSID) {
-        return (this.BSSID).matches(BSSID);
+    public boolean matches(AccessPoint ap) {
+        return (this.BSSID).equals(ap.BSSID);
     }
 
     public static class LevelComparator implements Comparator<AccessPoint> {
