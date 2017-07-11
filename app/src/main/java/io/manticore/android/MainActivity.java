@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here.
         switch (item.getItemId()) {
             case R.id.action_settings:
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -98,9 +99,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = fm.beginTransaction();
 
         if (NetUtils.isOnWifi(this)) {
-            transaction.replace(R.id.fragment, new NetworkScanner());
+            transaction.replace(R.id.fragment, new NetworkScanner(), NetworkScanner.TAG);
         } else {
-            transaction.replace(R.id.fragment, new WifiScanner());
+            transaction.replace(R.id.fragment, new WifiScanner(), WifiScanner.TAG);
         }
 
         transaction.commit();

@@ -12,7 +12,7 @@ public class NetworkScanner extends Fragment {
     private Context mContext;
     private Handler mHandler = new Handler();
 
-    private final String TAG = "NetworkScanner";
+    public static final String TAG = "NetworkScanner";
 
     private Runnable networkScan = new Runnable() {
         @Override

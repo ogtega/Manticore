@@ -39,6 +39,7 @@ import static io.manticore.android.util.WifiScanner.getWifiManager;
 public class WifiScanner extends Fragment {
 
     private final int RC_COARSE_LOCATION = 0xFFFF;
+    public static final String TAG = "WifiScanner";
 
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
 
