@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,6 @@ import static io.manticore.android.util.WifiScanner.getWifiManager;
  */
 public class WifiScanner extends Fragment {
 
-    private final String TAG = "WifiScanner";
     private final int RC_COARSE_LOCATION = 0xFFFF;
 
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
@@ -61,7 +59,6 @@ public class WifiScanner extends Fragment {
                 getWifiManager(mContext.getApplicationContext()).startScan();
 
                 if (EasyPermissions.hasPermissions(mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                    Log.i(TAG, "scanning");
                     new io.manticore.android.util.WifiScanner(new Consumer<ScanResult>() {
                         @Override
                         public void accept(@io.reactivex.annotations.NonNull ScanResult result) throws Exception {
@@ -100,7 +97,6 @@ public class WifiScanner extends Fragment {
         super.onAttach(context);
 
         mContext = context;
-        Log.i(TAG, "WifiScanner");
         if (!getWifiManager(mContext).isWifiEnabled()) getWifiManager(mContext).setWifiEnabled(true);
     }
 

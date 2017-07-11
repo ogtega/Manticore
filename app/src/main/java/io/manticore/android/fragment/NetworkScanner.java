@@ -3,7 +3,6 @@ package io.manticore.android.fragment;
 import android.content.Context;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import io.manticore.android.MainActivity;
 import io.manticore.android.util.NetUtils;
@@ -19,9 +18,7 @@ public class NetworkScanner extends Fragment {
         @Override
         public void run() {
             if(!NetUtils.isOnWifi(mContext)) {
-                if (isAdded()) {
-                    ((MainActivity) getActivity()).updateFragment();
-                }
+               ((MainActivity) getActivity()).updateFragment();
             } else {
                 // TODO: open them sockets ;)
                 mHandler.postDelayed(networkScan, 6000);
@@ -40,7 +37,6 @@ public class NetworkScanner extends Fragment {
         super.onAttach(context);
 
         mContext = context;
-        Log.i(TAG, "NetworkScanner");
     }
 
     @Override
