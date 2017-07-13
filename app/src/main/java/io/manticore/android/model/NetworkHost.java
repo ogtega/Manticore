@@ -16,13 +16,12 @@ import io.manticore.android.R;
 public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolder> {
 
     private int ping;
-    private boolean online;
+    private boolean online = true;
     private String address;
     private String hostname;
 
-    public NetworkHost(String address, String hostname, int ping, boolean online) {
+    public NetworkHost(String address, String hostname, int ping) {
         this.address = address;
-        this.online = online;
         this.hostname = hostname;
         this.ping = ping;
     }

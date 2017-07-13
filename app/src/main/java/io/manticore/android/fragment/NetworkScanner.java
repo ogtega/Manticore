@@ -20,7 +20,7 @@ public class NetworkScanner extends Fragment {
             if(!NetUtils.isOnWifi(mContext)) {
                ((MainActivity) getActivity()).updateFragment();
             } else {
-                // TODO: open them sockets ;)
+
                 mHandler.postDelayed(networkScan, 6000);
             }
         }
