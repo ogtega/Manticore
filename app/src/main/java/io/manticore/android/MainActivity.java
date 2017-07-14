@@ -16,6 +16,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.fragment.NetworkFragment;
 import io.manticore.android.fragment.WifiFragment;
+import io.manticore.android.receiver.WifiReceiver;
+import io.manticore.android.scanner.NetworkScanner;
 import io.manticore.android.util.WifiUtils;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -89,12 +91,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (WifiUtils.isOnWifi(this)) {
             if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                transaction.replace(R.id.fragment, new NetworkFragment(), NetworkFragment.TAG);
+                transaction.replace(R.id.fragment, new NetworkFragment(), NetworkScanner.TAG);
             } else {
                 EasyPermissions.requestPermissions(this, getString(R.string.permission_location_rationale), RC_COARSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
             }
         } else {
-            transaction.replace(R.id.fragment, new WifiFragment(), "WiFi");
+            transaction.replace(R.id.fragment, new WifiFragment(), WifiReceiver.TAG);
         }
 
         transaction.commit();

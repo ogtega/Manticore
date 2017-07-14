@@ -1,62 +1,34 @@
 package io.manticore.android.fragment;
 
 import android.content.Context;
-import android.os.Handler;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import io.manticore.android.MainActivity;
-import io.manticore.android.util.WifiUtils;
+import java.io.IOException;
+import java.net.InetAddress;
+
+import io.manticore.android.concurent.ThreadPool;
+import io.manticore.android.scanner.NetworkScanner;
 
 public class NetworkFragment extends Fragment {
 
-    public static final String TAG = "NetworkFragment";
-    private Context mContext;
-    private Handler mHandler = new Handler();
-    private Runnable networkScan = new Runnable() {
-        @Override
-        public void run() {
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-
-            if (!WifiUtils.isOnWifi(mContext)) {
-                ((MainActivity) getActivity()).methodPrompt();
-            } else {
-
-                mHandler.postDelayed(networkScan, 6000);
-            }
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mHandler = new Handler();
-    }
+    private NetworkScanner mScanner;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+    }
 
-        mContext = context;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mScanner = new NetworkScanner();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        mHandler.post(networkScan);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        mHandler.removeCallbacks(networkScan);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        mHandler.removeCallbacks(networkScan);
+        mScanner.run();
     }
 }
