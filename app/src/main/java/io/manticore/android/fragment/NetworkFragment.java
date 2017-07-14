@@ -5,20 +5,20 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 
 import io.manticore.android.MainActivity;
-import io.manticore.android.util.NetUtils;
+import io.manticore.android.util.WifiUtils;
 
-public class NetworkScanner extends Fragment {
+public class NetworkFragment extends Fragment {
 
+    public static final String TAG = "NetworkFragment";
     private Context mContext;
     private Handler mHandler = new Handler();
-
-    public static final String TAG = "NetworkScanner";
-
     private Runnable networkScan = new Runnable() {
         @Override
         public void run() {
-            if(!NetUtils.isOnWifi(mContext)) {
-               ((MainActivity) getActivity()).updateFragment();
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+
+            if (!WifiUtils.isOnWifi(mContext)) {
+                ((MainActivity) getActivity()).methodPrompt();
             } else {
 
                 mHandler.postDelayed(networkScan, 6000);

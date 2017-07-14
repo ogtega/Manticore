@@ -23,20 +23,17 @@ import io.manticore.android.R;
 
 public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolder> {
 
+    private static final String[] protocols = {"EAP", "WPA", "WEP"};
     private String ESSID;
     private String BSSID;
-
     private int level;
     private int channel;
     private int imageLevel;
     private double frequency;
     private DecimalFormat df = new DecimalFormat("#.0");
-
     private String vendor;
     private boolean secure;
     private String protocol = "None";
-
-    private static final String[] protocols = {"EAP", "WPA", "WEP"};
 
     public AccessPoint(ScanResult result) {
 
@@ -61,6 +58,19 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
         frequency = ((((result.frequency / 1000.0) * 10.0) / 10.0));
     }
 
+    private static int getChannel(int freq) {
+
+        if (freq == 2484) {
+            return 14;
+        }
+
+        if (freq < 2484) {
+            return (freq - 2407) / 5;
+        }
+
+        return freq / 5 - 1000;
+    }
+
     @Override
     public int getType() {
         return R.id.ap_item_id;
@@ -80,13 +90,22 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
         holder.protocol.setText(protocol);
         holder.signal.setImageState(secure ? new int[]{R.attr.state_encrypted} : new int[]{}, true);
         holder.signal.getDrawable().setLevel(imageLevel);
-        Log.i("AP", ESSID + ' ' + BSSID + ' ' + imageLevel + ':' + holder.signal.getDrawable().getLevel());
-        holder.details.setText(BSSID );
+        holder.details.setText(BSSID);
     }
 
     @Override
     public ViewHolder getViewHolder(View v) {
         return new ViewHolder(v);
+    }
+
+    // Compare AccessPoints by their MAC Address
+    public boolean matches(String bssid) {
+        return (this.BSSID).equals(bssid);
+    }
+
+    @Override
+    public View createView(Context ctx, @Nullable ViewGroup parent) {
+        return super.createView(ctx, parent);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -102,50 +121,5 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
 
             ButterKnife.bind(this, view);
         }
-    }
-
-    private static int getChannel(int freq) {
-
-        if (freq == 2484) {
-            return 14;
-        }
-
-        if (freq < 2484) {
-            return (freq - 2407) / 5;
-        }
-
-        return freq / 5 - 1000;
-    }
-
-    // Compare AccessPoints by their MAC Address
-    public boolean matches(String bssid) {
-        return (this.BSSID).equals(bssid);
-    }
-
-    public static class LevelComparator implements Comparator<AccessPoint> {
-
-        @Override
-        public int compare(AccessPoint ap, AccessPoint _ap) {
-            // Sort by signal strength
-            int difference = WifiManager.compareSignalLevel(_ap.level, ap.level);
-
-            if (difference != 0) {
-                return difference;
-            }
-            // Sort by ESSIDs
-            difference = ap.ESSID.compareToIgnoreCase(_ap.ESSID);
-
-            if (difference !=0) {
-                return difference;
-            }
-
-            // Sort by BSSIDs
-            return ap.BSSID.compareToIgnoreCase(_ap.BSSID);
-        }
-    }
-
-    @Override
-    public View createView(Context ctx, @Nullable ViewGroup parent) {
-        return super.createView(ctx, parent);
     }
 }
