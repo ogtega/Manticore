@@ -33,7 +33,6 @@ public class WifiReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         if (intent.getAction().matches(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-
             this.context.getApplicationContext().unregisterReceiver(this);
             Observable.fromIterable(getWifiManager(context.getApplicationContext()).getScanResults()).subscribe(consumer);
         }

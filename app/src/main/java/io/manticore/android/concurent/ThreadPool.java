@@ -1,8 +1,6 @@
 package io.manticore.android.concurent;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -26,7 +24,7 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     private ThreadPool() {
-        super(NUMBER_OF_CORES * 2, NUMBER_OF_CORES * 4, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        super(NUMBER_OF_CORES, NUMBER_OF_CORES * 3, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
     protected void beforeExecute(Thread t, Runnable r) {
