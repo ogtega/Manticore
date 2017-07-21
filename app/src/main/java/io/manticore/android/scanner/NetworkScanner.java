@@ -8,28 +8,41 @@ import java.net.InetAddress;
 import io.manticore.android.concurent.ThreadPool;
 
 public class NetworkScanner extends Thread {
-    public static final String TAG = "NetScan";
+    public static final String TAG = "Network";
 
     @Override
     public void run() {
+        int min = 1;
+        int max = 254;
+        int offset = 0;
+        boolean b = true;
 
-        for(int i = 0; i < 255; i++) {
-            final String host = "192.168.1." + i;
-            ThreadPool.getInstance().execute(new Runnable() {
-                @Override
-                public void run() {
-                    if(host.equals("192.168.1.254"))
-                        Log.i(TAG , "complete");
+        while(offset != 127) {
 
-                    try {
-                        if (InetAddress.getByName(host).isReachable(1000)) {
-                            Log.i(TAG, host + " is online");
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            final int curr = b? min + offset:max - offset;
+
+            check(curr);
+
+            if(!b) {offset++;}
+            b = !b;
         }
+    }
+
+    private void check(final int pos) {
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+
+                final String host = "192.168.1." + pos;
+
+                try {
+                    if (InetAddress.getByName(host).isReachable(600)) {
+                        Log.i(TAG, host + " is online");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

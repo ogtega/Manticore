@@ -1,12 +1,10 @@
 package io.manticore.android;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -62,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void methodPrompt() {
+    /*public void methodPrompt() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("The network state has changed")
@@ -82,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
+    }*/
 
     public void updateFragment() {
 
