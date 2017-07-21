@@ -10,7 +10,7 @@
                     <item android:drawable="@drawable/ic_signal_wifi_4" android:maxLevel="3"/>
                 </level-list>
             </item>
-            <item android:drawable="@drawable/ic_signal_wifi_lock" />
+            <item android:drawable="@drawable/ic_lock_wifi" />
         </layer-list>
     </item>
     <item app:state_encrypted="false">
@@ -22,3 +22,4 @@
         </level-list>
     </item>
 </selector>
+

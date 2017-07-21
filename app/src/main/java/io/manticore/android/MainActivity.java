@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.fragment.NetworkFragment;
 import io.manticore.android.fragment.WifiFragment;
 import io.manticore.android.receiver.WifiReceiver;
@@ -106,5 +107,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ThreadPool.getInstance().shutdown();
     }
 }

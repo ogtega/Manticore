@@ -24,7 +24,7 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     private ThreadPool() {
-        super(NUMBER_OF_CORES * 2, NUMBER_OF_CORES * 3, 3L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+        super(NUMBER_OF_CORES * 3, NUMBER_OF_CORES * 3, 3L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
     protected void beforeExecute(Thread t, Runnable r) {

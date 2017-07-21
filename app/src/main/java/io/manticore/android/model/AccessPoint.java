@@ -5,7 +5,6 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.text.DecimalFormat;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -35,7 +34,7 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
     private boolean secure;
     private String protocol = "None";
 
-    public AccessPoint(ScanResult result) {
+    private AccessPoint(ScanResult result) {
 
         ESSID = result.SSID;
         BSSID = result.BSSID;
@@ -56,6 +55,10 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
         vendor = "";
 
         frequency = ((((result.frequency / 1000.0) * 10.0) / 10.0));
+    }
+
+    public String getBSSID() {
+        return BSSID;
     }
 
     private static int getChannel(int freq) {
@@ -85,12 +88,14 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
     public void bindView(ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
 
+        holder.details.setText(BSSID);
+        holder.protocol.setText(protocol);
         holder.name.setText(String.format("%s%s", ESSID, vendor));
         holder.radio.setText(level + "db (" + df.format(frequency) + " Ghz) " + channel);
-        holder.protocol.setText(protocol);
+
         holder.signal.setImageState(secure ? new int[]{R.attr.state_encrypted} : new int[]{}, true);
-        holder.signal.getDrawable().setLevel(imageLevel);
-        holder.details.setText(BSSID);
+        holder.signal.setImageLevel(imageLevel);
+        holder.signal.setImageResource(R.drawable.ic_signal_wifi);
     }
 
     @Override
@@ -99,13 +104,23 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
     }
 
     // Compare AccessPoints by their MAC Address
-    public boolean matches(String bssid) {
-        return (this.BSSID).equals(bssid);
+    public boolean matches(AccessPoint ap) {
+        return (this.BSSID).equals(ap.BSSID);
     }
 
     @Override
     public View createView(Context ctx, @Nullable ViewGroup parent) {
         return super.createView(ctx, parent);
+    }
+
+    public static List<AccessPoint> fromScanResult(List<ScanResult> results) {
+        List<AccessPoint> res = new ArrayList<>();
+
+        for(ScanResult result : results) {
+            res.add(new AccessPoint(result));
+        }
+
+        return res;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
