@@ -1,6 +1,7 @@
 package io.manticore.android.fragment;
 
 import android.content.Context;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -33,21 +34,25 @@ public class WifiFragment extends Fragment {
 
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
 
+    private Context mContext;
     private WifiReceiver receiver;
     ScheduledExecutorService mExecutor;
     private FastItemAdapter<AccessPoint> mAdapter = new FastItemAdapter<>();
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (!getWifiManager(getContext()).isWifiEnabled())
-            getWifiManager(getContext()).setWifiEnabled(true);
+        mContext = context;
+        if (!getWifiManager(mContext).isWifiEnabled())
+            getWifiManager(mContext).setWifiEnabled(true);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mExecutor = Executors.newScheduledThreadPool(1);
     }
 
@@ -58,20 +63,20 @@ public class WifiFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         mListView.setAdapter(mAdapter);
-        mListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mListView.setLayoutManager(new LinearLayoutManager(mContext));
 
-        receiver = new WifiReceiver(new Consumer<AccessPoint>() {
+        receiver = new WifiReceiver(new Consumer<ScanResult>() {
             @Override
-            public void accept(@io.reactivex.annotations.NonNull AccessPoint ap) throws Exception {
+            public void accept(@io.reactivex.annotations.NonNull ScanResult result) throws Exception {
                 // Check if the result is a duplicate access point
-                for (AccessPoint item : mAdapter.getAdapterItems()) {
-                    if (item.matches(ap)) {
+                for (int i = 0; i < mAdapter.getAdapterItemCount(); i++) {
+                    if (mAdapter.getItem(i).matches(result.BSSID)) {
                         return;
                     }
                 }
 
-                Log.i(WifiReceiver.TAG, ap.getBSSID());
-                mAdapter.add(ap);
+                Log.i(WifiReceiver.TAG, result.BSSID);
+                mAdapter.add(new AccessPoint(result));
             }
         });
 
@@ -84,7 +89,7 @@ public class WifiFragment extends Fragment {
         mExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                receiver.scan(getActivity().getApplicationContext());
+                receiver.scan(mContext.getApplicationContext());
             }
         }, 0, 3, TimeUnit.SECONDS);
     }

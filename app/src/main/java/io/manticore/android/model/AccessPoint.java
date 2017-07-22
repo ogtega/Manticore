@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,11 +29,10 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
     private int imageLevel;
     private double frequency;
     private DecimalFormat df = new DecimalFormat("#.0");
-    private String vendor;
     private boolean secure;
     private String protocol = "None";
 
-    private AccessPoint(ScanResult result) {
+    public AccessPoint(ScanResult result) {
 
         ESSID = result.SSID;
         BSSID = result.BSSID;
@@ -52,13 +50,7 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
             }
         }
 
-        vendor = "";
-
         frequency = ((((result.frequency / 1000.0) * 10.0) / 10.0));
-    }
-
-    public String getBSSID() {
-        return BSSID;
     }
 
     private static int getChannel(int freq) {
@@ -90,7 +82,7 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
 
         holder.details.setText(BSSID);
         holder.protocol.setText(protocol);
-        holder.name.setText(String.format("%s%s", ESSID, vendor));
+        holder.name.setText(ESSID);
         holder.radio.setText(level + "db (" + df.format(frequency) + " Ghz) " + channel);
 
         holder.signal.setImageState(secure ? new int[]{R.attr.state_encrypted} : new int[]{}, true);
@@ -104,23 +96,13 @@ public class AccessPoint extends AbstractItem<AccessPoint, AccessPoint.ViewHolde
     }
 
     // Compare AccessPoints by their MAC Address
-    public boolean matches(AccessPoint ap) {
-        return (this.BSSID).equals(ap.BSSID);
+    public boolean matches(String BSSID) {
+        return (this.BSSID).equals(BSSID);
     }
 
     @Override
     public View createView(Context ctx, @Nullable ViewGroup parent) {
         return super.createView(ctx, parent);
-    }
-
-    public static List<AccessPoint> fromScanResult(List<ScanResult> results) {
-        List<AccessPoint> res = new ArrayList<>();
-
-        for(ScanResult result : results) {
-            res.add(new AccessPoint(result));
-        }
-
-        return res;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

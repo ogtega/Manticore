@@ -22,7 +22,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int RC_COARSE_LOCATION = 0xFFFF;
+    private final int RC_COURSE_LOCATION = 0xFFFF;
 
     protected @BindView(R.id.toolbar) Toolbar mToolbar;
 
@@ -88,16 +88,18 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
 
-        if (WifiUtils.isOnWifi(this)) {
+        // TODO: Implement a method to add the application to location services
+        /*if (!WifiUtils.isOnWifi(this)) {
             if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                transaction.replace(R.id.fragment, new NetworkFragment(), NetworkScanner.TAG);
+                transaction.replace(R.id.fragment, new WifiFragment(), WifiReceiver.TAG);
             } else {
-                EasyPermissions.requestPermissions(this, getString(R.string.permission_location_rationale), RC_COARSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+                EasyPermissions.requestPermissions(this, getString(R.string.permission_location_rationale), RC_COURSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
             }
         } else {
-            transaction.replace(R.id.fragment, new WifiFragment(), WifiReceiver.TAG);
+            transaction.replace(R.id.fragment, new NetworkFragment(), NetworkScanner.TAG);
         }
-
+        */
+        transaction.replace(R.id.fragment, new NetworkFragment(), NetworkScanner.TAG);
         transaction.commit();
     }
 
