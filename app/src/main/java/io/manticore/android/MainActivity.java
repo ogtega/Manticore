@@ -1,8 +1,6 @@
 package io.manticore.android;
 
-import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -14,17 +12,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.fragment.NetworkFragment;
-import io.manticore.android.fragment.WifiFragment;
-import io.manticore.android.receiver.WifiReceiver;
-import io.manticore.android.scanner.NetworkScanner;
-import io.manticore.android.util.WifiUtils;
-import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int RC_COURSE_LOCATION = 0xFFFF;
-
-    protected @BindView(R.id.toolbar) Toolbar mToolbar;
+    protected
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,54 +54,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*public void methodPrompt() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle("The network state has changed")
-                .setMessage("Do you want to switch your scanning mode?")
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // User dismissed the dialog
-                    }
-                })
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        updateFragment();
-                    }
-                });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }*/
-
     public void updateFragment() {
-
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-
-        // TODO: Implement a method to add the application to location services
-        /*if (!WifiUtils.isOnWifi(this)) {
-            if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                transaction.replace(R.id.fragment, new WifiFragment(), WifiReceiver.TAG);
-            } else {
-                EasyPermissions.requestPermissions(this, getString(R.string.permission_location_rationale), RC_COURSE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
-            }
-        } else {
-            transaction.replace(R.id.fragment, new NetworkFragment(), NetworkScanner.TAG);
-        }
-        */
-        transaction.replace(R.id.fragment, new NetworkFragment(), NetworkScanner.TAG);
+        transaction.replace(R.id.fragment, new NetworkFragment(), "NetworkFragment");
         transaction.commit();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        // Forward results to EasyPermissions
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     @Override

@@ -12,24 +12,26 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.R;
-import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.model.NetworkHost;
 import io.manticore.android.scanner.NetworkScanner;
+import io.manticore.android.util.NetUtils;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 
-import static io.manticore.android.scanner.NetworkScanner.TAG;
-
 public class NetworkFragment extends Fragment {
+
+    private int count;
+    private long start;
+
+    protected NetworkScanner scanner;
+    protected FastItemAdapter<NetworkHost> mAdapter = new FastItemAdapter<>();
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
 
-    private NetworkScanner scanner;
-    private FastItemAdapter<NetworkHost> mAdapter = new FastItemAdapter<>();
-
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
@@ -39,13 +41,19 @@ public class NetworkFragment extends Fragment {
         mListView.setAdapter(mAdapter);
         mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        scanner = new NetworkScanner(new Consumer<String>() {
+        scanner = new NetworkScanner(new Consumer<NetworkHost>() {
             @Override
-            public void accept(@NonNull final String s) throws Exception {
+            public void accept(@NonNull final NetworkHost host) throws Exception {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter.add(new NetworkHost(s));
+                        count++;
+
+                        if(host.isOnline())
+                            mAdapter.add(host);
+
+                        if(count == 255)
+                            Log.i(Thread.currentThread().getName(), "Completed in " + String.valueOf((System.currentTimeMillis() - start) / 1000.0) + "s");
                     }
                 });
             }
@@ -58,14 +66,9 @@ public class NetworkFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        Log.i(TAG, "scanning");
-        scanner.start();
-        ThreadPool.getInstance().resume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        ThreadPool.getInstance().pause();
+        if (NetUtils.onWifi(getActivity())) {
+            start = System.currentTimeMillis();
+            scanner.start();
+        }
     }
 }

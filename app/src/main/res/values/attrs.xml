@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="EncryptionState">
-        <attr name="state_encrypted" format="boolean"/>
+        <attr name="state_encrypted" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="OnlineState">
-        <attr name="state_online" format="boolean"/>
+        <attr name="state_online" format="boolean" />
     </declare-styleable>
 </resources>
