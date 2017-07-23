@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //ThreadPool.getInstance().pause();
+        ThreadPool.getInstance().shutdown();
     }
 
     @Override

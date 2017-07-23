@@ -53,7 +53,7 @@ public class NetworkFragment extends Fragment {
                             mAdapter.add(host);
 
                         if(count == 255)
-                            Log.i(Thread.currentThread().getName(), "Completed in " + String.valueOf((System.currentTimeMillis() - start) / 1000.0) + "s");
+                            Log.i(Thread.currentThread().getName(), String.format("Conducted %d successful scans in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start)/1e9));
                     }
                 });
             }
@@ -63,11 +63,11 @@ public class NetworkFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         if (NetUtils.onWifi(getActivity())) {
-            start = System.currentTimeMillis();
+            start = System.nanoTime();
             scanner.start();
         }
     }
