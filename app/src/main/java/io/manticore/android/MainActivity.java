@@ -1,7 +1,6 @@
 package io.manticore.android;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,9 +14,7 @@ import io.manticore.android.fragment.NetworkFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    protected
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    protected @BindView(R.id.toolbar) Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +24,20 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
+
+        setFragment();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        //ThreadPool.getInstance().resume();
+    }
 
-        updateFragment();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //ThreadPool.getInstance().pause();
     }
 
     @Override
@@ -54,9 +58,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateFragment() {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
+    public void setFragment() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment, new NetworkFragment(), "NetworkFragment");
         transaction.commit();
     }
