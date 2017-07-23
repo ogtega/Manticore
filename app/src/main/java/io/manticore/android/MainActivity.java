@@ -31,13 +31,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //ThreadPool.getInstance().resume();
+        ThreadPool.getInstance().resume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        ThreadPool.getInstance().shutdown();
+        ThreadPool.getInstance().pause();
     }
 
     @Override

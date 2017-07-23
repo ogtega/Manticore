@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
-import java.util.Date;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.R;
