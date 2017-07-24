@@ -21,10 +21,14 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
     private String hostname;
     private boolean online;
 
-    public NetworkHost(String address, String hostname,  boolean online) {
+    public NetworkHost(String address) {
+        this.address = address;
+    }
+
+    public NetworkHost(String address, String hostname) {
+        this.online = true;
         this.address = address;
         this.hostname = hostname;
-        this.online = online;
     }
 
     public boolean isOnline() {

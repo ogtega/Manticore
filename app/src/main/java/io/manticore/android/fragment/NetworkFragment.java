@@ -15,6 +15,7 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.R;
+import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.model.NetworkHost;
 import io.manticore.android.scanner.NetworkScanner;
 import io.manticore.android.util.NetUtils;
@@ -68,5 +69,19 @@ public class NetworkFragment extends Fragment {
             start = System.nanoTime();
             scanner.start();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ThreadPool.getInstance().resume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        
+        ThreadPool.getInstance().getQueue().clear();
     }
 }

@@ -2,9 +2,17 @@ package io.manticore.android.scanner;
 
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.model.NetworkHost;
@@ -45,17 +53,20 @@ public class NetworkScanner extends Thread {
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
-                    String address = "192.168.1." + host;
-                    String msg = "Scanning " + address;
+
+                    String _address = "192.168.1." + host;
+                    String msg = "Scanning " + _address;
 
                     try {
-                        if (InetAddress.getByName(address).isReachable(1000)) {
+
+                        InetAddress address = InetAddress.getByName(_address);
+
+                        if (address.isReachable(1000)) {
                             Log.i(Thread.currentThread().getName(), msg + " successful");
-                            String hostname = InetAddress.getByName(address).getHostName();
-                            Observable.just(new NetworkHost(address, hostname, true)).subscribe(consumer);
+                            Observable.just(new NetworkHost(_address, address.getHostName())).subscribe(consumer);
                         } else {
                             Log.i(Thread.currentThread().getName(), msg + " failed");
-                            Observable.just(new NetworkHost(address, null, false)).subscribe(consumer);
+                            Observable.just(new NetworkHost(_address)).subscribe(consumer);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -63,5 +74,14 @@ public class NetworkScanner extends Thread {
                 }
             });
         }
+    }
+
+    private String getMac() throws IOException, InterruptedException {
+        String res = null;
+
+        //TODO: Get the arp cache and parse it for the mac
+        //Process process = Runtime.getRuntime().exec("cat /proc/net/arp");
+
+        return res;
     }
 }

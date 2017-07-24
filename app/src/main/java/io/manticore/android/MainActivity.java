@@ -29,14 +29,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        ThreadPool.getInstance().resume();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
+
         ThreadPool.getInstance().pause();
     }
 
@@ -67,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         ThreadPool.getInstance().shutdown();
     }
 }
