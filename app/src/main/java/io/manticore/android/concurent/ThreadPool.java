@@ -2,6 +2,7 @@ package io.manticore.android.concurent;
 
 import android.util.Log;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -11,8 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import io.manticore.android.util.ThreadUtils;
 
 public class ThreadPool extends ThreadPoolExecutor {
-
     private static ThreadPool instance;
+
     private boolean isPaused;
     private ReentrantLock pauseLock = new ReentrantLock();
     private Condition unpaused = pauseLock.newCondition();
@@ -23,7 +24,7 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     public static ThreadPool getInstance() {
-        if (instance == null) {
+        if (instance == null || instance.isShutdown()) {
             synchronized (ThreadPool.class) {
                 instance = new ThreadPool();
             }

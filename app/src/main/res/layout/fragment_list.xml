@@ -3,13 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.manticore.android.fragment.WifiFragment">
+    tools:context="io.manticore.android.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/ap_listview"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="154dp"
-        tools:layout_editor_absoluteY="248dp" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/ap_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout_editor_absoluteX="154dp"
+            tools:layout_editor_absoluteY="248dp" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

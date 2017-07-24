@@ -3,14 +3,10 @@ package io.manticore.android.scanner;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +59,7 @@ public class NetworkScanner extends Thread {
 
                         if (address.isReachable(1000)) {
                             Log.i(Thread.currentThread().getName(), msg + " successful");
-                            Observable.just(new NetworkHost(_address, address.getHostName())).subscribe(consumer);
+                            Observable.just(new NetworkHost(_address, address.getHostName(), getMac(_address))).subscribe(consumer);
                         } else {
                             Log.i(Thread.currentThread().getName(), msg + " failed");
                             Observable.just(new NetworkHost(_address)).subscribe(consumer);
@@ -76,12 +72,21 @@ public class NetworkScanner extends Thread {
         }
     }
 
-    private String getMac() throws IOException, InterruptedException {
-        String res = null;
+    private String getMac(String ip) throws IOException {
+        Pattern pattern = Pattern.compile("([0-9a-fA-F]{2}[:]){5}[0-9a-fA-F][0-9a-fA-F]");
 
-        //TODO: Get the arp cache and parse it for the mac
-        //Process process = Runtime.getRuntime().exec("cat /proc/net/arp");
+        try (BufferedReader br = new BufferedReader(new FileReader("/proc/net/arp"))) {
+            for (String line; (line = br.readLine()) != null; ) {
+                if (line.contains(ip + ' ')) {
+                    Matcher matcher = pattern.matcher(line);
 
-        return res;
+                    if (matcher.find()) {
+                        return matcher.group();
+                    }
+                }
+            }
+        }
+
+        return "";
     }
 }

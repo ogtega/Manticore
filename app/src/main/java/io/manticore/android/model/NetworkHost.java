@@ -17,6 +17,7 @@ import io.manticore.android.R;
 
 public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolder> {
 
+    private String mac;
     private String address;
     private String hostname;
     private boolean online;
@@ -25,7 +26,8 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
         this.address = address;
     }
 
-    public NetworkHost(String address, String hostname) {
+    public NetworkHost(String address, String hostname, String mac) {
+        this.mac = mac;
         this.online = true;
         this.address = address;
         this.hostname = hostname;
@@ -59,13 +61,15 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
     public void bindView(ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
         holder.hostname.setText(hostname);
-        holder.address.setText(address);
+        holder.address.setText(address + ' ' + mac);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.net_item_address) TextView address;
-        @BindView(R.id.net_item_hostname) TextView hostname;
+        @BindView(R.id.net_item_address)
+        TextView address;
+        @BindView(R.id.net_item_hostname)
+        TextView hostname;
 
         ViewHolder(View view) {
             super(view);
