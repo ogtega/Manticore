@@ -63,7 +63,7 @@ public class NetworkFragment extends Fragment {
 
     public void startScan() {
 
-        if (NetUtils.onWifi(getActivity())) {
+        if (NetUtils.onWifi()) {
             start = System.nanoTime();
 
             mRefreshLayout.setRefreshing(true);

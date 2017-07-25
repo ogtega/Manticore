@@ -2,10 +2,10 @@ package io.manticore.android.model;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
 
@@ -17,19 +17,20 @@ import io.manticore.android.R;
 
 public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolder> {
 
+    private String ip;
     private String mac;
-    private String address;
     private String hostname;
+
     private boolean online;
 
-    public NetworkHost(String address) {
-        this.address = address;
+    public NetworkHost(String ip) {
+        this.ip = ip;
     }
 
-    public NetworkHost(String address, String hostname, String mac) {
+    public NetworkHost(String ip, String hostname, String mac) {
         this.mac = mac;
         this.online = true;
-        this.address = address;
+        this.ip = ip;
         this.hostname = hostname;
     }
 
@@ -61,15 +62,15 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
     public void bindView(ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
         holder.hostname.setText(hostname);
-        holder.address.setText(address + ' ' + mac);
+        holder.ip.setText(ip);
+        holder.mac.setText(mac);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.net_item_address)
-        TextView address;
-        @BindView(R.id.net_item_hostname)
-        TextView hostname;
+        @BindView(R.id.net_item_ip) AppCompatTextView ip;
+        @BindView(R.id.net_item_mac) AppCompatTextView mac;
+        @BindView(R.id.net_item_hostname) AppCompatTextView hostname;
 
         ViewHolder(View view) {
             super(view);

@@ -1,4 +1,4 @@
-package io.manticore.android;
+package io.manticore.android.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.manticore.android.R;
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.fragment.NetworkFragment;
 
