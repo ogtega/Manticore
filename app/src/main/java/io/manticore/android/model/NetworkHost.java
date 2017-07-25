@@ -19,6 +19,7 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
 
     private String ip;
     private String mac;
+    private String vendor;
     private String hostname;
 
     private boolean online;
@@ -27,11 +28,12 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
         this.ip = ip;
     }
 
-    public NetworkHost(String ip, String hostname, String mac) {
+    public NetworkHost(String ip, String hostname, String mac, String vendor) {
         this.mac = mac;
         this.online = true;
         this.ip = ip;
         this.hostname = hostname;
+        this.vendor = vendor;
     }
 
     public boolean isOnline() {
@@ -61,15 +63,18 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
     @Override
     public void bindView(ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
-        holder.hostname.setText(hostname);
+
         holder.ip.setText(ip);
         holder.mac.setText(mac);
+        holder.vendor.setText(vendor);
+        holder.hostname.setText(hostname);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.net_item_ip) AppCompatTextView ip;
         @BindView(R.id.net_item_mac) AppCompatTextView mac;
+        @BindView(R.id.net_item_vendor) AppCompatTextView vendor;
         @BindView(R.id.net_item_hostname) AppCompatTextView hostname;
 
         ViewHolder(View view) {
