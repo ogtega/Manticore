@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,27 +24,41 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class NetworkScanner extends Thread {
+
     private Consumer<NetworkHost> consumer;
+    private List<Integer> hosts = new ArrayList<>();
     private OkHttpClient client = new OkHttpClient();
     private int[] bases = new int[IOUtils.getCores()];
 
-    public NetworkScanner(Consumer<NetworkHost> consumer) {
+    public NetworkScanner(Consumer<NetworkHost> consumer, List<NetworkHost> discovered) {
+        ThreadPool.getInstance().clean();
+
         this.consumer = consumer;
+
+        for (NetworkHost host : discovered) {
+            hosts.add(host.getHost());
+        }
 
         for (int i = 0; i < bases.length; i++) {
             bases[i] = (int) (i * Math.ceil(255.0 / bases.length));
         }
-
-        Log.i(Thread.currentThread().getName(), Arrays.toString(bases));
+        //Log.i(Thread.currentThread().getName(), Arrays.toString(bases));
     }
 
     @Override
     public void run() {
         int offset = 1;
 
+        for (int host : hosts) {
+            scan(host);
+        }
+
         while (offset < bases[1] + 1) {
             for (int base : bases) {
-                scan(base + offset);
+                int addr = base + offset;
+
+                if (!hosts.contains(addr))
+                    scan(addr);
             }
 
             offset++;
@@ -50,11 +66,12 @@ public class NetworkScanner extends Thread {
     }
 
     private void scan(final int host) {
+
         if (host < 256) {
 
-            ThreadPool.getInstance().execute(new Runnable() {
+            ThreadPool.getInstance().submit(new Callable() {
                 @Override
-                public void run() {
+                public Object call() throws Exception {
 
                     String _address = "192.168.1." + host;
                     String msg = "Scanning " + _address;
@@ -77,6 +94,8 @@ public class NetworkScanner extends Thread {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
+                    return null;
                 }
             });
         }

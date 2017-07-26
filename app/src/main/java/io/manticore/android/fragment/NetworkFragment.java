@@ -32,9 +32,9 @@ public class NetworkFragment extends Fragment {
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
     protected @BindView(R.id.swipe_refresh) SwipeRefreshLayout mRefreshLayout;
 
+    private int count;
     private long start;
-    volatile private int count;
-    private NetworkScanner scanner;
+    NetworkScanner scanner;
     private FastItemAdapter<NetworkHost> mAdapter = new FastItemAdapter<>();
 
     @Override
@@ -49,10 +49,8 @@ public class NetworkFragment extends Fragment {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(count == 255) {
-                    count = 0;
-                    startScan();
-                }
+                count = 0;
+                startScan();
             }
         });
 
@@ -101,10 +99,11 @@ public class NetworkFragment extends Fragment {
                         }
                     });
                 }
-            });
+            }, mAdapter.getAdapterItems());
 
             scanner.start();
         } else {
+
             startScan();
         }
     }

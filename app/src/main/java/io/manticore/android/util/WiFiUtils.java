@@ -2,7 +2,9 @@ package io.manticore.android.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -13,7 +15,6 @@ import static io.manticore.android.App.getAppContext;
 
 public class WiFiUtils {
 
-
     public static boolean isWiFiEnabled() {
         return getManager().isWifiEnabled();
     }
@@ -23,7 +24,6 @@ public class WiFiUtils {
         return (WifiManager) getAppContext().getSystemService(Context.WIFI_SERVICE);
     }
 
-    // https://stackoverflow.com/a/39792022
     public static String getMac() throws SocketException {
 
         List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
@@ -35,15 +35,15 @@ public class WiFiUtils {
                 return "";
             }
 
-            StringBuilder res1 = new StringBuilder();
+            StringBuilder res = new StringBuilder();
             for (byte b : macBytes) {
-                res1.append(String.format("%02X:", b));
+                res.append(String.format("%02X:", b));
             }
 
-            if (res1.length() > 0) {
-                res1.deleteCharAt(res1.length() - 1);
+            if (res.length() > 0) {
+                res.deleteCharAt(res.length() - 1);
             }
-            return res1.toString();
+            return res.toString();
         }
 
         return "02:00:00:00:00:00";

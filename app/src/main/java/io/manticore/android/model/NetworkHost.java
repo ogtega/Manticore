@@ -39,7 +39,7 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
         this.vendor = vendor;
     }
 
-    private int getHost() {
+    public int getHost() {
         return host;
     }
 

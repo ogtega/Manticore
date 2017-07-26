@@ -1,7 +1,11 @@
 package io.manticore.android.concurent;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +15,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import io.manticore.android.util.IOUtils;
 
 public class ThreadPool extends ThreadPoolExecutor {
-    private static ThreadPool instance;
+    private static final ThreadPool instance = new ThreadPool();
 
     private boolean isPaused;
+    private ArrayList<Future> futures = new ArrayList<>();
     private ReentrantLock pauseLock = new ReentrantLock();
     private Condition unpaused = pauseLock.newCondition();
 
@@ -23,12 +28,6 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     public static ThreadPool getInstance() {
-        if (instance == null || instance.isShutdown()) {
-            synchronized (ThreadPool.class) {
-                instance = new ThreadPool();
-            }
-        }
-
         return instance;
     }
 
@@ -41,6 +40,27 @@ public class ThreadPool extends ThreadPoolExecutor {
             t.interrupt();
         } finally {
             pauseLock.unlock();
+        }
+    }
+
+    @NonNull
+    @Override
+    public Future<?> submit(Runnable task) {
+        futures.add(super.submit(task));
+        return super.submit(task);
+    }
+
+    public void clean() {
+        synchronized (this) {
+            getQueue().clear();
+
+            for(Future task : futures) {
+                if (!task.isDone()) {
+                    task.cancel(true);
+                }
+            }
+
+            futures.clear();
         }
     }
 
