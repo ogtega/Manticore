@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,29 +24,28 @@ public class WiFiUtils {
     }
 
     // https://stackoverflow.com/a/39792022
-    public static String getMac() {
-        try {
-            List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface nif : all) {
-                if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
+    public static String getMac() throws SocketException {
 
-                byte[] macBytes = nif.getHardwareAddress();
-                if (macBytes == null) {
-                    return "";
-                }
+        List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
+        for (NetworkInterface nif : all) {
+            if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
 
-                StringBuilder res1 = new StringBuilder();
-                for (byte b : macBytes) {
-                    res1.append(String.format("%02X:",b));
-                }
-
-                if (res1.length() > 0) {
-                    res1.deleteCharAt(res1.length() - 1);
-                }
-                return res1.toString();
+            byte[] macBytes = nif.getHardwareAddress();
+            if (macBytes == null) {
+                return "";
             }
-        } catch (Exception ex) {
+
+            StringBuilder res1 = new StringBuilder();
+            for (byte b : macBytes) {
+                res1.append(String.format("%02X:", b));
+            }
+
+            if (res1.length() > 0) {
+                res1.deleteCharAt(res1.length() - 1);
+            }
+            return res1.toString();
         }
+
         return "02:00:00:00:00:00";
     }
 }
