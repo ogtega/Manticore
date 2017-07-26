@@ -2,14 +2,13 @@ package io.manticore.android.concurent;
 
 import android.util.Log;
 
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.manticore.android.util.ThreadUtils;
+import io.manticore.android.util.IOUtils;
 
 public class ThreadPool extends ThreadPoolExecutor {
     private static ThreadPool instance;
@@ -19,8 +18,8 @@ public class ThreadPool extends ThreadPoolExecutor {
     private Condition unpaused = pauseLock.newCondition();
 
     private ThreadPool() {
-        super(ThreadUtils.getCores() * 3, ThreadUtils.getCores() * 4, 3L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
-        Log.i(Thread.currentThread().getName(), "Using " + String.valueOf(ThreadUtils.getCores() * 3) + " to " + String.valueOf(ThreadUtils.getCores() * 4) + " threads");
+        super(IOUtils.getCores() * 3, IOUtils.getCores() * 4, 3L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+        Log.i(Thread.currentThread().getName(), "Using " + String.valueOf(IOUtils.getCores() * 3) + " to " + String.valueOf(IOUtils.getCores() * 4) + " threads");
     }
 
     public static ThreadPool getInstance() {

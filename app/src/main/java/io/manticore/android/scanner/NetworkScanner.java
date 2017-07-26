@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.model.NetworkHost;
-import io.manticore.android.util.ThreadUtils;
+import io.manticore.android.util.IOUtils;
+import io.manticore.android.util.WiFiUtils;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
@@ -23,7 +24,7 @@ import okhttp3.Response;
 public class NetworkScanner extends Thread {
     private Consumer<NetworkHost> consumer;
     private OkHttpClient client = new OkHttpClient();
-    private int[] bases = new int[ThreadUtils.getCores()];
+    private int[] bases = new int[IOUtils.getCores()];
 
     public NetworkScanner(Consumer<NetworkHost> consumer) {
         this.consumer = consumer;
@@ -84,22 +85,18 @@ public class NetworkScanner extends Thread {
     private String getVendor(String mac) throws IOException {
         String result = "";
 
-        if(!mac.isEmpty()) {
-            String url = ("http://api.macvendors.com/"
-                    + URLEncoder.encode(mac.substring(0, mac.length() / 2), "UTF-8"));
+        String url = ("http://api.macvendors.com/"
+                + URLEncoder.encode(mac.substring(0, mac.length() / 2), "UTF-8"));
 
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-            Response response = client.newCall(request).execute();
+        Response response = client.newCall(request).execute();
 
-            if (response.body() != null) {
-                result = response.body().string();
-                response.body().close();
-            }
-        } else {
-            return "This device";
+        if (response.body() != null) {
+            result = response.body().string();
+            response.body().close();
         }
 
         return result;
@@ -120,6 +117,6 @@ public class NetworkScanner extends Thread {
             }
         }
 
-        return "";
+        return WiFiUtils.getMac();
     }
 }

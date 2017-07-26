@@ -13,9 +13,7 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -24,9 +22,10 @@ import io.manticore.android.R;
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.model.NetworkHost;
 import io.manticore.android.scanner.NetworkScanner;
-import io.manticore.android.util.NetUtils;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
+
+import static io.manticore.android.util.WiFiUtils.isWiFiEnabled;
 
 public class NetworkFragment extends Fragment {
 
@@ -68,7 +67,7 @@ public class NetworkFragment extends Fragment {
 
     public void startScan() {
 
-        if (NetUtils.onWifi()) {
+        if (isWiFiEnabled()) {
             start = System.nanoTime();
 
             mRefreshLayout.setRefreshing(true);
@@ -105,21 +104,20 @@ public class NetworkFragment extends Fragment {
             });
 
             scanner.start();
+        } else {
+            startScan();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         ThreadPool.getInstance().resume();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         scanner.interrupt();
-        ThreadPool.getInstance().getQueue().clear();
     }
 }

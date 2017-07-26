@@ -1,6 +1,7 @@
 package io.manticore.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 public class App extends Application {
@@ -13,9 +14,8 @@ public class App extends Application {
         init();
     }
 
-    @NonNull
-    public static App getInstance() {
-        return instance;
+    public static Context getAppContext() {
+        return instance.getApplicationContext();
     }
 
     private void init() {
