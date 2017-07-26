@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
 
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -17,6 +18,7 @@ import io.manticore.android.R;
 
 public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolder> {
 
+    private int host;
     private String ip;
     private String mac;
     private String vendor;
@@ -28,12 +30,21 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
         this.ip = ip;
     }
 
-    public NetworkHost(String ip, String hostname, String mac, String vendor) {
+    public NetworkHost(int host, String ip, String hostname, String mac, String vendor) {
+        this.host = host;
         this.mac = mac;
         this.online = true;
         this.ip = ip;
         this.hostname = hostname;
         this.vendor = vendor;
+    }
+
+    private int getHost() {
+        return host;
+    }
+
+    public String getMac() {
+        return mac;
     }
 
     public boolean isOnline() {
@@ -81,6 +92,14 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
             super(view);
 
             ButterKnife.bind(this, view);
+        }
+    }
+
+    public static class HostComparator implements Comparator<NetworkHost> {
+
+        @Override
+        public int compare(NetworkHost host, NetworkHost t1) {
+            return host.getHost() - (t1.getHost());
         }
     }
 }

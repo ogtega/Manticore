@@ -13,6 +13,11 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.R;
@@ -77,12 +82,21 @@ public class NetworkFragment extends Fragment {
                                 count++;
 
                                 if (host.isOnline()) {
-                                    mAdapter.add(host);
+                                    for(int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
+                                        if(mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
+                                            return;
+                                        }
+                                    }
+
+                                    List<NetworkHost> hosts = mAdapter.getAdapterItems();
+                                    hosts.add(host);
+                                    Collections.sort(hosts, new NetworkHost.HostComparator());
+                                    mAdapter.setNewList(hosts);
                                 }
 
                                 if (count == 255) {
                                     mRefreshLayout.setRefreshing(false);
-                                    Log.i(Thread.currentThread().getName(), String.format("Conducted %d successful scans in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
+                                    Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
                                 }
                             }
                         }

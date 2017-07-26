@@ -67,7 +67,7 @@ public class NetworkScanner extends Thread {
 
                             String mac = getMac(_address);
                             String vendor = getVendor(mac);
-                            Observable.just(new NetworkHost(_address, address.getHostName(), mac, vendor)).subscribe(consumer);
+                            Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
                         } else {
                             Log.i(Thread.currentThread().getName(), msg + " failed");
 
