@@ -34,16 +34,18 @@ public class NetworkFragment extends Fragment {
 
     private int count;
     private long start;
-    NetworkScanner scanner;
-    private FastItemAdapter<NetworkHost> mAdapter = new FastItemAdapter<>();
+    private NetworkScanner scanner;
+    private final FastItemAdapter<NetworkHost> mAdapter = new FastItemAdapter<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ButterKnife.bind(this, view);
 
+        mAdapter.withSelectable(true);
+        mAdapter.setHasStableIds(true);
         mListView.setAdapter(mAdapter);
-        mListView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mListView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mRefreshLayout.setColorSchemeResources(R.color.accent);
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -75,12 +77,12 @@ public class NetworkFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(!ThreadPool.getInstance().isShutdown()) {
+                            if (!ThreadPool.getInstance().isShutdown()) {
                                 count++;
 
                                 if (host.isOnline()) {
-                                    for(int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
-                                        if(mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
+                                    for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
+                                        if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
                                             return;
                                         }
                                     }

@@ -2,9 +2,8 @@ package io.manticore.android.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.preference.PreferenceManager;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -17,6 +16,14 @@ public class WiFiUtils {
 
     public static boolean isWiFiEnabled() {
         return getManager().isWifiEnabled();
+    }
+
+    public static WifiInfo getWifiInfo() {
+        return getManager().getConnectionInfo();
+    }
+
+    public static int calculateSignalLevel(int rssi) {
+        return WifiManager.calculateSignalLevel(rssi, 4);
     }
 
     @SuppressLint("WifiManagerLeak")
