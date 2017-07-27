@@ -7,8 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,21 +21,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class NetworkScanner extends Thread {
+public class NetworkScanner implements Runnable {
 
     private Consumer<NetworkHost> consumer;
-    private List<Integer> hosts = new ArrayList<>();
     private OkHttpClient client = new OkHttpClient();
     private int[] bases = new int[IOUtils.getCores()];
 
-    public NetworkScanner(Consumer<NetworkHost> consumer, List<NetworkHost> discovered) {
+    public NetworkScanner(Consumer<NetworkHost> consumer) {
         ThreadPool.getInstance().clean();
 
         this.consumer = consumer;
-
-        for (NetworkHost host : discovered) {
-            hosts.add(host.getHost());
-        }
 
         for (int i = 0; i < bases.length; i++) {
             bases[i] = (int) (i * Math.ceil(255.0 / bases.length));
@@ -49,16 +42,9 @@ public class NetworkScanner extends Thread {
     public void run() {
         int offset = 1;
 
-        for (int host : hosts) {
-            scan(host);
-        }
-
         while (offset < bases[1] + 1) {
             for (int base : bases) {
-                int addr = base + offset;
-
-                if (!hosts.contains(addr))
-                    scan(addr);
+                scan(base + offset);
             }
 
             offset++;
@@ -93,6 +79,8 @@ public class NetworkScanner extends Thread {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+
+                        Observable.just(new NetworkHost(_address)).subscribe(consumer);
                     }
 
                     return null;

@@ -29,12 +29,15 @@ import static io.manticore.android.util.WiFiUtils.isWiFiEnabled;
 
 public class NetworkFragment extends Fragment {
 
+    private long start;
+
+    private NetworkScanner scanner;
+
+    public static volatile int count;
+
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
     protected @BindView(R.id.swipe_refresh) SwipeRefreshLayout mRefreshLayout;
 
-    private int count;
-    private long start;
-    private NetworkScanner scanner;
     private final FastItemAdapter<NetworkHost> mAdapter = new FastItemAdapter<>();
 
     @Override
@@ -52,62 +55,70 @@ public class NetworkFragment extends Fragment {
             @Override
             public void onRefresh() {
                 count = 0;
-                startScan();
+                scan();
             }
         });
-
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        startScan();
+
+        scanner = new NetworkScanner(new Consumer<NetworkHost>() {
+
+            @Override
+            public void accept(@NonNull final NetworkHost host) throws Exception {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            count++;
+
+                            if (host.isOnline()) {
+                                for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
+                                    if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
+                                        return;
+                                    }
+                                }
+
+                                List<NetworkHost> hosts = mAdapter.getAdapterItems();
+                                hosts.add(host);
+                                Collections.sort(hosts, new NetworkHost.HostComparator());
+                                mAdapter.setNewList(hosts);
+                            }
+
+                            if (count == 255) {
+                                mRefreshLayout.setRefreshing(false);
+                                Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        scan();
     }
 
-    public void startScan() {
+    public void scan() {
 
         if (isWiFiEnabled()) {
             start = System.nanoTime();
 
             mRefreshLayout.setRefreshing(true);
-            scanner = new NetworkScanner(new Consumer<NetworkHost>() {
-                @Override
-                public void accept(@NonNull final NetworkHost host) throws Exception {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!ThreadPool.getInstance().isShutdown()) {
-                                count++;
-
-                                if (host.isOnline()) {
-                                    for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
-                                        if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
-                                            return;
-                                        }
-                                    }
-
-                                    List<NetworkHost> hosts = mAdapter.getAdapterItems();
-                                    hosts.add(host);
-                                    Collections.sort(hosts, new NetworkHost.HostComparator());
-                                    mAdapter.setNewList(hosts);
-                                }
-
-                                if (count == 255) {
-                                    mRefreshLayout.setRefreshing(false);
-                                    Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
-                                }
-                            }
-                        }
-                    });
-                }
-            }, mAdapter.getAdapterItems());
-
-            scanner.start();
+            ThreadPool.getInstance().execute(scanner);
         } else {
 
-            startScan();
+            scan();
         }
+    }
+
+    @Override
+    public void onPause() {
+        ThreadPool.getInstance().pause();
+        super.onPause();
     }
 
     @Override
@@ -118,7 +129,7 @@ public class NetworkFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        ThreadPool.getInstance().clean();
         super.onDestroy();
-        scanner.interrupt();
     }
 }

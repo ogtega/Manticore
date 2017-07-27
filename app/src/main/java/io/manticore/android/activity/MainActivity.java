@@ -30,13 +30,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        ThreadPool.getInstance().pause();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -58,12 +51,5 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment, new NetworkFragment(), "NetworkFragment");
         transaction.commit();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        ThreadPool.getInstance().shutdown();
     }
 }

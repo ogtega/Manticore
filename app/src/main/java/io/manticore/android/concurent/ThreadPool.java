@@ -5,7 +5,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +19,7 @@ public class ThreadPool extends ThreadPoolExecutor {
     private boolean isPaused;
     private ArrayList<Future> futures = new ArrayList<>();
     private ReentrantLock pauseLock = new ReentrantLock();
-    private Condition unpaused = pauseLock.newCondition();
+    private Condition condition = pauseLock.newCondition();
 
     private ThreadPool() {
         super(IOUtils.getCores() * 3, IOUtils.getCores() * 4, 3L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
@@ -35,7 +34,7 @@ public class ThreadPool extends ThreadPoolExecutor {
         super.beforeExecute(t, r);
         pauseLock.lock();
         try {
-            while (isPaused) unpaused.await();
+            while (isPaused) condition.await();
         } catch (InterruptedException ie) {
             t.interrupt();
         } finally {
@@ -77,7 +76,7 @@ public class ThreadPool extends ThreadPoolExecutor {
         pauseLock.lock();
         try {
             isPaused = false;
-            unpaused.signalAll();
+            condition.signalAll();
         } finally {
             pauseLock.unlock();
         }
