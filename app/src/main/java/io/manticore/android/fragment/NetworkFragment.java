@@ -110,8 +110,7 @@ public class NetworkFragment extends Fragment {
             mRefreshLayout.setRefreshing(true);
             ThreadPool.getInstance().execute(scanner);
         } else {
-
-            scan();
+            mRefreshLayout.setRefreshing(false);
         }
     }
 

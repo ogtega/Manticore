@@ -21,6 +21,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static io.manticore.android.util.WiFiUtils.getDhcpInfo;
+import static io.manticore.android.util.WiFiUtils.intToIPv4;
+
 public class NetworkScanner implements Runnable {
 
     private Consumer<NetworkHost> consumer;
@@ -71,6 +74,12 @@ public class NetworkScanner implements Runnable {
 
                             String mac = getMac(_address);
                             String vendor = getVendor(mac);
+
+                            if (_address.equals(intToIPv4(getDhcpInfo().gateway))) {
+                                Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
+                                return null;
+                            }
+
                             Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
                         } else {
                             Log.i(Thread.currentThread().getName(), msg + " failed");
@@ -92,7 +101,7 @@ public class NetworkScanner implements Runnable {
     private String getVendor(String mac) throws IOException {
         String result = "";
 
-        String url = ("http://api.macvendors.com/"
+        String url = ("https://api.macvendors.com/"
                 + URLEncoder.encode(mac.substring(0, mac.length() / 2), "UTF-8"));
 
         Request request = new Request.Builder()

@@ -2,6 +2,7 @@ package io.manticore.android.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -20,6 +21,17 @@ public class WiFiUtils {
 
     public static WifiInfo getWifiInfo() {
         return getManager().getConnectionInfo();
+    }
+
+    public static DhcpInfo getDhcpInfo() {
+        return getManager().getDhcpInfo();
+    }
+
+    public static String intToIPv4(int i) {
+        return (i & 0xFF) + "." +
+                ((i >> 8) & 0xFF) + "." +
+                ((i >> 16) & 0xFF) + "." +
+                ((i >> 24) & 0xFF);
     }
 
     public static int calculateSignalLevel(int rssi) {
