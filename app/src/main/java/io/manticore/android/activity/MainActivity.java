@@ -12,6 +12,9 @@ import butterknife.ButterKnife;
 import io.manticore.android.R;
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.fragment.NetworkFragment;
+import io.manticore.android.util.WiFiUtils;
+
+import static io.manticore.android.util.WiFiUtils.getWifiInfo;
 
 public class MainActivity extends AppCompatActivity {
 

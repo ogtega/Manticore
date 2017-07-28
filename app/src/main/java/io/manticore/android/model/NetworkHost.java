@@ -2,7 +2,6 @@ package io.manticore.android.model;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -10,17 +9,12 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
 
-import java.net.SocketException;
 import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.R;
-import io.manticore.android.util.WiFiUtils;
-
-import static io.manticore.android.util.WiFiUtils.getDhcpInfo;
-import static io.manticore.android.util.WiFiUtils.intToIPv4;
 
 public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolder> {
 
@@ -51,6 +45,14 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
 
     public String getMac() {
         return mac;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 
     public boolean isOnline() {
@@ -84,28 +86,15 @@ public class NetworkHost extends AbstractItem<NetworkHost, NetworkHost.ViewHolde
         holder.ip.setText(ip);
         holder.mac.setText(mac);
         holder.vendor.setText(vendor);
-        holder.hostname.setText(hostname);
-
-        if (ip.equals(intToIPv4(getDhcpInfo().gateway))) {
-            holder.deviceType.setImageResource(R.drawable.ic_router);
-        }
-
-        try {
-            if(mac.equals(WiFiUtils.getMac())) {
-                holder.deviceType.setImageResource(R.drawable.ic_phone);
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
+        holder.name.setText(hostname);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.net_item_ip) AppCompatTextView ip;
         @BindView(R.id.net_item_mac) AppCompatTextView mac;
-        @BindView(R.id.net_item_vendor) AppCompatTextView vendor;
-        @BindView(R.id.net_item_hostname) AppCompatTextView hostname;
-        @BindView(R.id.net_item_type) AppCompatImageView deviceType;
+        @BindView(R.id.net_item_name) AppCompatTextView name;
+        @BindView(R.id.net_item_details) AppCompatTextView vendor;
 
         ViewHolder(View view) {
             super(view);

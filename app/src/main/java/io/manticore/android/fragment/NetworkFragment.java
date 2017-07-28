@@ -1,5 +1,6 @@
 package io.manticore.android.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,15 +27,18 @@ import io.manticore.android.scanner.NetworkScanner;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 
+import static io.manticore.android.util.WiFiUtils.getDhcpInfo;
+import static io.manticore.android.util.WiFiUtils.getMac;
+import static io.manticore.android.util.WiFiUtils.getWifiInfo;
+import static io.manticore.android.util.WiFiUtils.intToIPv4;
 import static io.manticore.android.util.WiFiUtils.isWiFiEnabled;
 
 public class NetworkFragment extends Fragment {
 
+    public int count;
     private long start;
 
     private NetworkScanner scanner;
-
-    public static volatile int count;
 
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
     protected @BindView(R.id.swipe_refresh) SwipeRefreshLayout mRefreshLayout;
@@ -81,6 +86,16 @@ public class NetworkFragment extends Fragment {
                                     if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
                                         return;
                                     }
+                                }
+
+                                if (host.getIp().equals(intToIPv4(getDhcpInfo().gateway))) {
+                                    host.setHostname(getWifiInfo().getSSID());
+                                } else try {
+                                    if(host.getMac().equals(getMac())) {
+                                        host.setHostname(Build.MODEL + ' ' + "(This Device)");
+                                    }
+                                } catch (SocketException e) {
+                                    e.printStackTrace();
                                 }
 
                                 List<NetworkHost> hosts = mAdapter.getAdapterItems();
