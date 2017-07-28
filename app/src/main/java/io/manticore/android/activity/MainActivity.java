@@ -1,7 +1,7 @@
 package io.manticore.android.activity;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -10,15 +10,16 @@ import android.view.MenuItem;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.manticore.android.R;
-import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.fragment.NetworkFragment;
-import io.manticore.android.util.WiFiUtils;
-
-import static io.manticore.android.util.WiFiUtils.getWifiInfo;
+import io.manticore.android.fragment.PreferenceFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     protected @BindView(R.id.toolbar) Toolbar mToolbar;
+
+    private Fragment current;
+    private NetworkFragment netFragment = new NetworkFragment();
+    private PreferenceFragment prefFragment = new PreferenceFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
 
-        setFragment();
+        setFragment(netFragment);
     }
 
     @Override
@@ -44,15 +45,31 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here.
         switch (item.getItemId()) {
             case R.id.action_settings:
+                setFragment(prefFragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void setFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment, new NetworkFragment(), "NetworkFragment");
-        transaction.commit();
+    @Override
+    public void onBackPressed() {
+
+        if (current == netFragment) {
+            super.onBackPressed();
+        } else {
+            setFragment(netFragment);
+        }
+    }
+
+    public void setFragment(Fragment fragment) {
+
+        if (current != fragment) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment, fragment)
+                    .commit();
+        }
+
+        current = fragment;
     }
 }

@@ -51,7 +51,6 @@ public class NetworkFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         mAdapter.withSelectable(true);
-        mAdapter.setHasStableIds(true);
         mListView.setAdapter(mAdapter);
         mListView.setLayoutManager(new LinearLayoutManager(getContext()));
 

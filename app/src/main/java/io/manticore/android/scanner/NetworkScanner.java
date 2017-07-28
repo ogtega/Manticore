@@ -1,7 +1,5 @@
 package io.manticore.android.scanner;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -38,7 +36,6 @@ public class NetworkScanner implements Runnable {
         for (int i = 0; i < bases.length; i++) {
             bases[i] = (int) (i * Math.ceil(255.0 / bases.length));
         }
-        //Log.i(Thread.currentThread().getName(), Arrays.toString(bases));
     }
 
     @Override
@@ -63,14 +60,12 @@ public class NetworkScanner implements Runnable {
                 public Object call() throws Exception {
 
                     String _address = "192.168.1." + host;
-                    String msg = "Scanning " + _address;
 
                     try {
 
                         InetAddress address = InetAddress.getByName(_address);
 
                         if (address.isReachable(1000)) {
-                            Log.i(Thread.currentThread().getName(), msg + " successful");
 
                             String mac = getMac(_address);
                             String vendor = getVendor(mac);
@@ -82,7 +77,6 @@ public class NetworkScanner implements Runnable {
 
                             Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
                         } else {
-                            Log.i(Thread.currentThread().getName(), msg + " failed");
 
                             Observable.just(new NetworkHost(_address)).subscribe(consumer);
                         }
