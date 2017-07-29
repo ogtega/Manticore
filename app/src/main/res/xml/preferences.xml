@@ -3,16 +3,14 @@
 
     <android.support.v7.preference.PreferenceCategory android:title="General">
 
-        <ListPreference
-            android:key="scan_timeout"
-            android:summary="Defines the host discovery timeout"
-            android:title="Scan Timeout" />
+        <android.support.v7.preference.ListPreference
+            android:defaultValue="0"
+            android:entries="@array/scanner_timeout"
+            android:entryValues="@array/scanner_timeout_values"
+            android:key="pref_scanner_timeout"
+            android:summary="Set the timeout for host discovery"
+            android:title="Scanner timeout" />
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="key3"
-            android:summary="CheckBox Summary"
-            android:title="CheckBox Preference" />
     </android.support.v7.preference.PreferenceCategory>
 
 </android.support.v7.preference.PreferenceScreen>

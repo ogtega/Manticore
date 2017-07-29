@@ -27,6 +27,7 @@ import io.manticore.android.scanner.NetworkScanner;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 
+import static io.manticore.android.util.TimeUtils.getScannerTimeout;
 import static io.manticore.android.util.WiFiUtils.getDhcpInfo;
 import static io.manticore.android.util.WiFiUtils.getMac;
 import static io.manticore.android.util.WiFiUtils.getWifiInfo;
@@ -37,7 +38,6 @@ public class NetworkFragment extends Fragment {
 
     public int count;
     private long start;
-
     private NetworkScanner scanner;
 
     protected @BindView(R.id.ap_listview) RecyclerView mListView;
@@ -69,60 +69,67 @@ public class NetworkFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        scanner = new NetworkScanner(new Consumer<NetworkHost>() {
+        if (count == 0) {
+            scanner = new NetworkScanner(new Consumer<NetworkHost>() {
 
-            @Override
-            public void accept(@NonNull final NetworkHost host) throws Exception {
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void accept(@NonNull final NetworkHost host) throws Exception {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            count++;
+                            @Override
+                            public void run() {
+                                count++;
 
-                            if (host.isOnline()) {
-                                for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
-                                    if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
-                                        return;
+                                if (host.isOnline()) {
+                                    for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
+                                        if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
+                                            return;
+                                        }
                                     }
+
+                                    if (host.getIp().equals(intToIPv4(getDhcpInfo().gateway))) {
+                                        host.setHostname(getWifiInfo().getSSID());
+                                    } else try {
+                                        if (host.getMac().equals(getMac())) {
+                                            host.setHostname(Build.MODEL + ' ' + "(This Device)");
+                                        }
+                                    } catch (SocketException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    List<NetworkHost> hosts = mAdapter.getAdapterItems();
+                                    hosts.add(host);
+                                    Collections.sort(hosts, new NetworkHost.HostComparator());
+                                    mAdapter.setNewList(hosts);
                                 }
 
-                                if (host.getIp().equals(intToIPv4(getDhcpInfo().gateway))) {
-                                    host.setHostname(getWifiInfo().getSSID());
-                                } else try {
-                                    if(host.getMac().equals(getMac())) {
-                                        host.setHostname(Build.MODEL + ' ' + "(This Device)");
-                                    }
-                                } catch (SocketException e) {
-                                    e.printStackTrace();
+                                if (count == 255) {
+                                    mRefreshLayout.setRefreshing(false);
+                                    Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
                                 }
-
-                                List<NetworkHost> hosts = mAdapter.getAdapterItems();
-                                hosts.add(host);
-                                Collections.sort(hosts, new NetworkHost.HostComparator());
-                                mAdapter.setNewList(hosts);
                             }
-
-                            if (count == 255) {
-                                mRefreshLayout.setRefreshing(false);
-                                Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
-            }
-        });
+            });
 
-        scan();
+            scan();
+        }
     }
 
     public void scan() {
 
         if (isWiFiEnabled()) {
+            Log.i(Thread.currentThread().getName(), String.valueOf((int) (1000 * getScannerTimeout())));
+
             start = System.nanoTime();
 
-            mRefreshLayout.setRefreshing(true);
+            scanner.setTimeout((int) (1000 * getScannerTimeout()));
+
             ThreadPool.getInstance().execute(scanner);
+
+            mRefreshLayout.setRefreshing(true);
         } else {
             mRefreshLayout.setRefreshing(false);
         }

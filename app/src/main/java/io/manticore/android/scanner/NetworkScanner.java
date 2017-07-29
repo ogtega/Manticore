@@ -24,6 +24,7 @@ import static io.manticore.android.util.WiFiUtils.intToIPv4;
 
 public class NetworkScanner implements Runnable {
 
+    private int timeout;
     private Consumer<NetworkHost> consumer;
     private OkHttpClient client = new OkHttpClient();
     private int[] bases = new int[IOUtils.getCores()];
@@ -51,6 +52,10 @@ public class NetworkScanner implements Runnable {
         }
     }
 
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
     private void scan(final int host) {
 
         if (host < 256) {
@@ -65,7 +70,7 @@ public class NetworkScanner implements Runnable {
 
                         InetAddress address = InetAddress.getByName(_address);
 
-                        if (address.isReachable(1000)) {
+                        if (address.isReachable(timeout)) {
 
                             String mac = getMac(_address);
                             String vendor = getVendor(mac);
