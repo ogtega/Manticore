@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,39 +59,36 @@ public class NetworkScanner implements Runnable {
 
         if (host < 256) {
 
-            ThreadPool.getInstance().submit(new Callable() {
-                @Override
-                public Object call() throws Exception {
+            ThreadPool.getInstance().submit(() -> {
 
-                    String _address = "192.168.1." + host;
+                String _address = "192.168.1." + host;
 
-                    try {
+                try {
 
-                        InetAddress address = InetAddress.getByName(_address);
+                    InetAddress address = InetAddress.getByName(_address);
 
-                        if (address.isReachable(timeout)) {
+                    if (address.isReachable(timeout)) {
 
-                            String mac = getMac(_address);
-                            String vendor = getVendor(mac);
+                        String mac = getMac(_address);
+                        String vendor = getVendor(mac);
 
-                            if (_address.equals(intToIPv4(getDhcpInfo().gateway))) {
-                                Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
-                                return null;
-                            }
-
+                        if (_address.equals(intToIPv4(getDhcpInfo().gateway))) {
                             Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
-                        } else {
-
-                            Observable.just(new NetworkHost(_address)).subscribe(consumer);
+                            return 0;
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+                        Observable.just(new NetworkHost(host, _address, address.getHostName(), mac, vendor)).subscribe(consumer);
+                    } else {
 
                         Observable.just(new NetworkHost(_address)).subscribe(consumer);
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
 
-                    return null;
+                    Observable.just(new NetworkHost(_address)).subscribe(consumer);
                 }
+
+                return 0;
             });
         }
     }

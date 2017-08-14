@@ -12,9 +12,13 @@ android {
         android.defaultConfig.vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -37,9 +41,10 @@ dependencies {
 
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
 
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-    compile 'com.android.support:design:26.0.0-alpha1'
-    compile 'com.android.support:preference-v7:26.0.0-alpha1'
-    compile 'com.android.support:preference-v14:26.0.0-alpha1'
+    compile 'com.android.support:appcompat-v7:26.0.1'
+    compile 'com.android.support:design:26.0.1'
+    compile 'com.android.support:preference-v7:26.0.1'
+    compile 'com.android.support:preference-v14:26.0.1'
+
     testCompile 'junit:junit:4.12'
 }

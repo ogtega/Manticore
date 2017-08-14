@@ -24,8 +24,6 @@ import io.manticore.android.R;
 import io.manticore.android.concurent.ThreadPool;
 import io.manticore.android.model.NetworkHost;
 import io.manticore.android.scanner.NetworkScanner;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 
 import static io.manticore.android.util.TimeUtils.getScannerTimeout;
 import static io.manticore.android.util.WiFiUtils.getDhcpInfo;
@@ -55,12 +53,9 @@ public class NetworkFragment extends Fragment {
         mListView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mRefreshLayout.setColorSchemeResources(R.color.accent);
-        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                count = 0;
-                scan();
-            }
+        mRefreshLayout.setOnRefreshListener(() -> {
+            count = 0;
+            scan();
         });
         return view;
     }
@@ -70,47 +65,39 @@ public class NetworkFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (count == 0) {
-            scanner = new NetworkScanner(new Consumer<NetworkHost>() {
+            scanner = new NetworkScanner(host -> {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        count++;
 
-                @Override
-                public void accept(@NonNull final NetworkHost host) throws Exception {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                count++;
-
-                                if (host.isOnline()) {
-                                    for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
-                                        if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
-                                            return;
-                                        }
-                                    }
-
-                                    if (host.getIp().equals(intToIPv4(getDhcpInfo().gateway))) {
-                                        host.setHostname(getWifiInfo().getSSID());
-                                    } else try {
-                                        if (host.getMac().equals(getMac())) {
-                                            host.setHostname(Build.MODEL + ' ' + "(This Device)");
-                                        }
-                                    } catch (SocketException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    List<NetworkHost> hosts = mAdapter.getAdapterItems();
-                                    hosts.add(host);
-                                    Collections.sort(hosts, new NetworkHost.HostComparator());
-                                    mAdapter.setNewList(hosts);
-                                }
-
-                                if (count == 255) {
-                                    mRefreshLayout.setRefreshing(false);
-                                    Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
+                        if (host.isOnline()) {
+                            for (int i = 0; i < mAdapter.getAdapterItems().size(); i++) {
+                                if (mAdapter.getAdapterItem(i).getMac().equals(host.getMac())) {
+                                    return;
                                 }
                             }
-                        });
-                    }
+
+                            if (host.getIp().equals(intToIPv4(getDhcpInfo().gateway))) {
+                                host.setHostname(getWifiInfo().getSSID());
+                            } else try {
+                                if (host.getMac().equals(getMac())) {
+                                    host.setHostname(Build.MODEL + ' ' + "(This Device)");
+                                }
+                            } catch (SocketException e) {
+                                e.printStackTrace();
+                            }
+
+                            List<NetworkHost> hosts = mAdapter.getAdapterItems();
+                            hosts.add(host);
+                            Collections.sort(hosts, new NetworkHost.HostComparator());
+                            mAdapter.setNewList(hosts);
+                        }
+
+                        if (count == 255) {
+                            mRefreshLayout.setRefreshing(false);
+                            Log.i(Thread.currentThread().getName(), String.format("Found %d online hosts in %.3fs %n", mAdapter.getAdapterItemCount(), (System.nanoTime() - start) / 1e9));
+                        }
+                    });
                 }
             });
 
