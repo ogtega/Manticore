@@ -41,10 +41,10 @@ dependencies {
 
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
 
-    compile 'com.android.support:appcompat-v7:26.0.1'
-    compile 'com.android.support:design:26.0.1'
-    compile 'com.android.support:preference-v7:26.0.1'
-    compile 'com.android.support:preference-v14:26.0.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:preference-v7:26.1.0'
+    compile 'com.android.support:preference-v14:26.1.0'
 
     testCompile 'junit:junit:4.12'
 }
